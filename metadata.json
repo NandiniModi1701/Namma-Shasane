@@ -1,0 +1,9 @@
+{
+  "name": "Namma-Shasane",
+  "description": "An Inscription Decoder that brings Karnataka's historical inscriptions to life using AI and interactive maps. Learn about the 'Talking History' of ancient stones.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ],
+  "majorCapabilities": []
+}

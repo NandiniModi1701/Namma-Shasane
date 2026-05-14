@@ -1,0 +1,50 @@
+{
+  "entities": {
+    "Inscription": {
+      "title": "Historical Inscription",
+      "description": "A documented historical stone inscription (Shasane).",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of the inscription" },
+        "description": { "type": "string", "description": "English translation and history" },
+        "translationKannada": { "type": "string", "description": "Modern Kannada translation" },
+        "location": {
+          "type": "object",
+          "properties": {
+            "lat": { "type": "number" },
+            "lng": { "type": "number" }
+          },
+          "required": ["lat", "lng"]
+        },
+        "imageUrl": { "type": "string", "description": "URL of the captured photo" },
+        "epoch": { "type": "string", "description": "Historical period/Dynasty" },
+        "reportedBy": { "type": "string", "description": "User ID of the reporter" },
+        "status": { "type": "string", "enum": ["normal", "damaged"], "description": "Current preservation status" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "location", "status", "createdAt"]
+    },
+    "Report": {
+      "title": "Damage Report",
+      "description": "A report regarding a damaged inscription.",
+      "type": "object",
+      "properties": {
+        "inscriptionId": { "type": "string" },
+        "description": { "type": "string" },
+        "reporterId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["inscriptionId", "description", "createdAt"]
+    }
+  },
+  "firestore": {
+    "inscriptions": {
+      "schema": "Inscription",
+      "description": "Documented inscriptions across Karnataka"
+    },
+    "reports": {
+      "schema": "Report",
+      "description": "Damage reports for inscriptions"
+    }
+  }
+}

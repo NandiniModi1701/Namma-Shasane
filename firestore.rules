@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidInscription(data) {
+      return data.keys().hasAll(['title', 'location', 'status', 'createdAt']) &&
+             data.title is string && data.title.size() <= 200 &&
+             data.location.lat is number && data.location.lng is number &&
+             data.status in ['normal', 'damaged'] &&
+             data.createdAt == request.time;
+    }
+
+    function isValidReport(data) {
+      return data.keys().hasAll(['inscriptionId', 'description', 'createdAt']) &&
+             data.inscriptionId is string &&
+             data.description is string && data.description.size() <= 1000 &&
+             data.createdAt == request.time;
+    }
+
+    match /inscriptions/{inscriptionId} {
+      allow read: if true; // Publicly viewable
+      allow create: if isSignedIn() && isValidInscription(request.resource.data);
+      allow update: if isSignedIn() && (
+        // Only allow status updates for damage reporting by community
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']) &&
+        request.resource.data.status in ['normal', 'damaged']
+      );
+    }
+
+    match /reports/{reportId} {
+      allow create: if isSignedIn() && isValidReport(request.resource.data);
+      allow read: if isSignedIn(); // Logged in users can see reports (or maybe only admins, but let's keep it simple)
+    }
+  }
+}
